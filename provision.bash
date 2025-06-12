@@ -8,9 +8,9 @@ clear
 
 ##
 
-set -e
+## set -e
 
-set -x
+## set -x
 
 ##
 
