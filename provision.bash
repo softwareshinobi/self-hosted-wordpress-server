@@ -25,3 +25,15 @@ cd install-docker
 sudo bash provision.bash
 
 echo "finished installing docker"
+
+##
+
+docker stop $(docker ps -a -q)
+
+docker system prune -a -f
+
+docker volume prune -a -f
+
+docker image ls
+
+echo "docker cleaned up for wordpress"
