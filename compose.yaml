@@ -2,23 +2,17 @@ services:
 
 ##########################################
 ##
-## wordpress / networking
+## wordpress / global networking
 ##
 ##########################################
 
-    compose-public-wordpress-proxy:
+    wordpress-proxy:
 
-        container_name: compose-public-wordpress-proxy
+        container_name: wordpress-proxy
 
-        image: nginxproxy/nginx-proxy:1.6
+        image: softwareshinobi/docker-container-proxy
 
         restart: unless-stopped
-
-        ports:
-
-            - 80:80
-
-            - 443:443
 
         volumes:
 
@@ -30,6 +24,12 @@ services:
 
             - /var/docker/nginx/vhost:/etc/nginx/vhost.d
 
+        ports:
+
+            - 80:80
+
+            - 443:443
+
         logging:
 
             options:
@@ -38,9 +38,9 @@ services:
 
                 max-file: "3"
 
-    compose-public-wordpress-letsencrypt:
+    wordpress-letsencrypt:
 
-        container_name: compose-public-wordpress-letsencrypt
+        container_name: wordpress-letsencrypt
 
         image: jrcs/letsencrypt-nginx-proxy-companion
 
@@ -48,7 +48,7 @@ services:
 
         volumes_from:
 
-            - compose-public-wordpress-proxy
+            - wordpress-proxy
 
         volumes:
 
@@ -58,7 +58,7 @@ services:
 
         environment:
 
-            DEFAULT_EMAIL: the.software.shinobi@gmail.com
+            DEFAULT_EMAIL: troy@softwareshinobi.com
 
 ##########################################
 ##
@@ -66,13 +66,17 @@ services:
 ##
 ##########################################
 
-    compose-public-wordpress-database:
+    wordpress-database:
 
-        container_name: compose-public-wordpress-database
+        container_name: wordpress-database
 
         image: mariadb:latest
 
         restart: unless-stopped
+        
+        volumes:
+
+            - /volumes/database:/var/lib/mysql
 
         ports:
 
@@ -82,29 +86,26 @@ services:
 
             MYSQL_ROOT_PASSWORD: aggiepride
 
-            MYSQL_DATABASE: hello_world_wordpress
+            MYSQL_DATABASE: wordpress
 
-            MYSQL_USER: hello_world_wordpress
+            MYSQL_USER: wordpress
 
-            MYSQL_PASSWORD: hello_world_wordpress
+            MYSQL_PASSWORD: wordpress
 
-        volumes:
-
-            - /volumes/helloworld.com/database:/var/lib/mysql
             
-    compose-public-wordpress-phpmyadmin:
+    wordpress-phpmyadmin:
 
-        container_name: compose-public-wordpress-phpmyadmin
+        container_name: wordpress-phpmyadmin
 
         image: beeyev/phpmyadmin-lightweight
 
         depends_on:
 
-           - compose-public-wordpress-database
+           - wordpress-database
 
         links:
 
-           - compose-public-wordpress-database
+           - wordpress-database
 
         ports:
 
@@ -112,7 +113,11 @@ services:
 
         environment:
 
-            PMA_HOST: compose-public-wordpress-database
+            PMA_HOST: wordpress-database
+
+            VIRTUAL_HOST: database.example.org
+
+            LETSENCRYPT_HOST: database.example.org
 
 ##########################################
 ##
@@ -120,10 +125,9 @@ services:
 ##
 ##########################################
 
+    wordpress-server:
 
-    compose-public-wordpress-server:
-
-        container_name: compose-public-wordpress-server
+        container_name: wordpress-server
 
         image: wordpress:latest
 
@@ -131,23 +135,27 @@ services:
 
         depends_on:
 
-            - compose-public-wordpress-database
+            - wordpress-database
 
         volumes:
 
-            - /volumes/helloworld.com/:/var/www/html
+            - /volumes/wordpress/:/var/www/html
 
+        ports:
+
+            - "127.0.0.1:8000:80"
+ 
         environment:
 
-            WORDPRESS_DB_HOST: compose-public-wordpress-database:3306
+            WORDPRESS_DB_HOST: wordpress-database:3306
 
-            WORDPRESS_DB_USER: hello_world_wordpress
+            WORDPRESS_DB_USER: wordpress
 
-            WORDPRESS_DB_PASSWORD: hello_world_wordpress
+            WORDPRESS_DB_PASSWORD: wordpress
 
-            WORDPRESS_DB_NAME: hello_world_wordpress
+            WORDPRESS_DB_NAME: wordpress
 
-            VIRTUAL_HOST: helloworld.com
+            VIRTUAL_HOST: example.org
 
-            LETSENCRYPT_HOST: helloworld.com
+            LETSENCRYPT_HOST: example.org
 
