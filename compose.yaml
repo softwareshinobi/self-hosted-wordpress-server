@@ -91,7 +91,6 @@ services:
             MYSQL_USER: wordpress
 
             MYSQL_PASSWORD: wordpress
-
             
     wordpress-phpmyadmin:
 
@@ -155,7 +154,6 @@ services:
 
             WORDPRESS_DB_NAME: wordpress
 
-            VIRTUAL_HOST: example.org
+            VIRTUAL_HOST: blog.embanet.online
 
-            LETSENCRYPT_HOST: example.org
-
+            LETSENCRYPT_HOST: blog.embanet.online
