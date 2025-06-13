@@ -2,17 +2,19 @@
 
 ##
 
-reset;
+reset
 
-clear;
+clear
+
+##
+
+set -e
+
+set -x
 
 ##
 
-set -e;
-
-set -x;
-
-##
+docker compose pull
 
 docker compose down --remove-orphans
 
